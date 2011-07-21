@@ -1,127 +1,141 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <title>App List</title>
-        <script type="text/javascript" charset="utf-8" src="phonegap-0.9.3.js"></script>
+<head>
+    <title>App List</title>
+    <script type="text/javascript" charset="utf-8" src="phonegap-0.9.3.js"></script>
+    <script src="plugin/launchApp.js"></script>
+
+    <link rel="stylesheet" href="jquery.mobile-1.0b1.min.css"/>
+    <script src="jquery-1.6.1.min.js"></script>
+    <script src="jquery.tmpl.min.js"></script>
+    <script src="jquery.mobile-1.0b1.min.js"></script>
 
 
-        <link rel="stylesheet" href="jquery.mobile-1.0b1.min.css"/>
-        <script src="jquery-1.6.1.min.js"></script>
-        <script src="jquery.tmpl.min.js"></script>
-        <script src="jquery.mobile-1.0b1.min.js"></script>
-
-        <script type="text/javascript">
+    <script type="text/javascript">
 
 
+        $(function() {
+            var appTemplate = '<li><a href="#" data-transition="slideup"><img src="${iconImagePath}"><h4>${appName}</h4><p>${appDesc}</p></a><a href="#" data-icon="plus"></a></li>';
 
-            $(function() {
-                var appTemplate = '<li><a href="#" data-transition="slideup"><img src="${iconImagePath}"><h4>${appName}</h4><p>${appDesc}</p></a><a href="#" data-icon="plus"></a></li>';
+            function addAppToList(data) {
+                $.tmpl(appTemplate, data).appendTo('#applist');
+                $('#applist').listview('refresh');
+            }
 
-                function addAppToList(data){
-                    $.tmpl(appTemplate,data).appendTo('#applist');
-                    $('#applist').listview('refresh');
-                }
-
-                $('div').live('swipe', function(event, ui) {
-                    var data = {
-                        iconImagePath: 'images/app/angry-bird.jpg',
-                        appName: 'Google+',
-                        appDesc: 'Wow!'
-                    };
-                    addAppToList(data);
-                });
-
-
+            $('div').live('swipe', function(event, ui) {
+                var data = {
+                    iconImagePath: 'images/app/angry-bird.jpg',
+                    appName: 'Google+',
+                    appDesc: 'Wow!'
+                };
+                addAppToList(data);
             });
 
 
-        </script>
+        });
 
-    </head>
-    <body>
+        function launchApp(id) {
 
-        <!-- Start of first page -->
-        <div data-role="page"  data-theme="d">
+            window.plugins.launchapp.launch(
+                    {
+                        url: 'url'
+                    },
+                    function() {
+                    },
+                    function() {
+                        alert('Failed to open URL via Android Intent')
+                    }
+            );
+        }
 
-            <div data-role="header" data-theme="b" >
-                <h1>App List</h1>
-                <a href="#" data-icon="gear" class="ui-btn-right">Options</a>
-            </div>
-            <!-- /header -->
+    </script>
 
-            <div data-role="content">
+</head>
+<body>
 
-                <ul data-role="listview" id="applist">
-                    <li>
-                        <a href="#" data-transition="slideup">
-                            <img src="images/app/angry-bird.jpg">
-                            <h4>Angry Birds</h4>
-                            <p>The survival of the Angry Birds is at stake.</p>
-                        </a>
-                        <a href="#" data-icon="plus"></a>
-                    </li>
-                </ul>
+<!-- Start of first page -->
+<div data-role="page" data-theme="d">
 
-                <!--<div data-role="collapsible">
-                    <h3>bar</h3>
+    <div data-role="header" data-theme="b">
+        <h1>App List</h1>
+        <a href="#" data-icon="gear" class="ui-btn-right">Options</a>
+    </div>
+    <!-- /header -->
 
-                    <p>View internal page called <a href="#bar" data-role="button">bar</a></p>
+    <div data-role="content">
 
+        <ul data-role="listview" id="applist">
+            <li>
+                <a href="#" id="app01" onclick="alert('click');launchApp(this.id);">
+                    <img src="images/app/angry-bird.jpg">
+                    <h4>Angry Birds</h4>
 
-                </div>
+                    <p>The survival of the Angry Birds is at stake.</p>
+                </a>
+                <a href="#" data-icon="plus"></a>
+            </li>
+        </ul>
 
-                <div data-role="collapsible">
-                    <h3>baz</h3>
+        <!--<div data-role="collapsible">
+            <h3>bar</h3>
 
-                    <p>View internal page called <a href="#baz" data-role="button" data-rel="dialog"
-                                                    data-transition="pop">baz</a>
-                        as a dialog.
-                    </p>
-                </div>
-
-
-                <ul data-role="listview">
-                    <li>
-                        <a href="#bar" data-transition="slideup">Slideup </a>
-                    </li>
-                    <li>
-                        <a href="tel:10010" data-transition="fade">Call 10010 </a>
-                    </li>
-                    <li>
-                        <a href="#" class="linkToBaz">JS to Baz </a>
-                    </li>
-                </ul>
-
-                <div data-role="fieldcontain">
-                    <label for="select-choice-1" class="select">Choose shipping method:</label>
-                    <select name="select-choice-1" id="select-choice-1">
-                        <option value="standard">Standard: 7 day</option>
-                        <option value="rush">Rush: 3 days</option>
-                        <option value="express">Express: next day</option>
-                        <option value="overnight">Overnight</option>
-                    </select>
-                </div>-->
+            <p>View internal page called <a href="#bar" data-role="button">bar</a></p>
 
 
-                <!-- /grid-a -->
-
-
-            </div>
-            <!-- /content -->
-
-            <div data-role="footer" data-theme="b"  data-id="theFooter" data-position="fixed">
-                <div data-role="navbar">
-                    <ul>
-                        <li><a href="#" data-icon="home">Home</a></li>
-                        <li><a href="#" data-icon="grid">My Apps</a></li>
-                    </ul>
-                </div>
-                <!-- /navbar -->
-            </div>
-            <!-- /footer -->
         </div>
-        <!-- /page -->
+
+        <div data-role="collapsible">
+            <h3>baz</h3>
+
+            <p>View internal page called <a href="#baz" data-role="button" data-rel="dialog"
+                                            data-transition="pop">baz</a>
+                as a dialog.
+            </p>
+        </div>
 
 
-    </body>
+        <ul data-role="listview">
+            <li>
+                <a href="#bar" data-transition="slideup">Slideup </a>
+            </li>
+            <li>
+                <a href="tel:10010" data-transition="fade">Call 10010 </a>
+            </li>
+            <li>
+                <a href="#" class="linkToBaz">JS to Baz </a>
+            </li>
+        </ul>
+
+        <div data-role="fieldcontain">
+            <label for="select-choice-1" class="select">Choose shipping method:</label>
+            <select name="select-choice-1" id="select-choice-1">
+                <option value="standard">Standard: 7 day</option>
+                <option value="rush">Rush: 3 days</option>
+                <option value="express">Express: next day</option>
+                <option value="overnight">Overnight</option>
+            </select>
+        </div>-->
+
+
+        <!-- /grid-a -->
+
+
+    </div>
+    <!-- /content -->
+
+    <div data-role="footer" data-theme="b" data-id="theFooter" data-position="fixed">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#" data-icon="home">Home</a></li>
+                <li><a href="#" data-icon="grid">My Apps</a></li>
+            </ul>
+        </div>
+        <!-- /navbar -->
+    </div>
+    <!-- /footer -->
+</div>
+<!-- /page -->
+
+
+</body>
 </html>
