@@ -9,7 +9,11 @@ public class LaunchAppPlugin extends Plugin{
 
     @Override
     public PluginResult execute(String action, JSONArray args, String callbackId) {
-        this.ctx.startActivity(new Intent(this.ctx, LaunchAppActivity.class));
+        try {
+            this.ctx.startActivity(new Intent(this.ctx, LaunchAppActivity.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return new PluginResult(PluginResult.Status.OK);
     }
 }
