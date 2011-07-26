@@ -4,11 +4,12 @@
     <title>App List</title>
     <script type="text/javascript" charset="utf-8" src="phonegap-0.9.3.js"></script>
     <script src="plugin/launchApp.js"></script>
+    <script src="plugin/downloadApp.js"></script>
 
     <link rel="stylesheet" href="jquery.mobile-1.0b1.min.css"/>
 
     <style>
-        .appIcon{
+        .appIcon {
             margin: 10px;
             width: 60px;
             height: 60px;
@@ -41,6 +42,24 @@
             );
         }
 
+        function download(id) {
+            var app = APPStore.cachedApps[id];
+            if (app) {
+                window.plugins.downloadapp.download(
+                        {
+                            id: app.id,
+                            url: app.packageUrl
+                        },
+                        function() {
+                            alert('Download Success: ' + app.name)
+                        },
+                        function() {
+                            alert('Failed to download app: ' + app.name)
+                        }
+                );
+            }
+        }
+
 
         $(document).ready(function() {
 
@@ -48,7 +67,8 @@
 
 
             $('.appButton').live('tap', function() {
-                launchApp('app01', 'Angry Birds');
+                download(this.id);
+//                launchApp('app01', 'Angry Birds');
             });
 
 
@@ -56,11 +76,14 @@
                 appStore.load(onAppLoad);
             });
 
+            $('.launchAppBtn').live('tap', function(event, ui) {
+                launchApp(this.id, 'Angry Birds');
+            });
+
             function onAppLoad(data) {
 
                 for (var i = 0; i < data.length; i++) {
                     var app = data[i];
-                    alert(app.imageUrl);
                     addAppToList(app);
                 }
             }
@@ -72,7 +95,7 @@
                 appStore.load(onAppLoad);
             }
 
-            var appTemplate = '<li><a href="#" data-transition="slideup" class="appLink"><img src="${imageUrl}" class="appIcon"><h4>${name}</h4><p>${description}</p></a><a href="#" data-icon="plus" class="appButton"></a></li>';
+            var appTemplate = '<li><a href="#" data-transition="slideup" class="appLink"><img src="${imageUrl}" class="appIcon"><h4>${name}</h4><p>${description}</p></a><a href="#" id="app${id}" data-icon="plus" class="appButton"></a></li>';
 
             function addAppToList(data) {
                 $.tmpl(appTemplate, data).appendTo('#applist');
@@ -87,25 +110,30 @@
         });
 
         function launchApp(id, name) {
-            navigator.notification.confirm(
-                    'Launching application: ' + name, // message
-                    function(data) {
-                        if (data == 1) {
-                            window.plugins.launchapp.launch(
-                                    {
-                                        appId: id
-                                    },
-                                    function() {
-                                    },
-                                    function() {
-                                        alert('Failed to open URL via Android Intent')
-                                    }
-                            );
-                        }
-                    }, // callback to invoke with index of button pressed
-                    'Confirmation', // title
-                    'Sure,Cancel'          // buttonLabels
-            );
+            var app = APPStore.cachedApps[id];
+            if (app) {
+
+                navigator.notification.confirm(
+                        'Launching application: ' + name, // message
+                        function(data) {
+                            if (data == 1) {
+                                window.plugins.launchapp.launch(
+                                        {
+                                            id: app.id
+                                        },
+                                        function() {
+                                        },
+                                        function() {
+                                            alert('Failed to open URL via Android Intent')
+                                        }
+                                );
+                            }
+                        }, // callback to invoke with index of button pressed
+                        'Confirmation', // title
+                        'Sure,Cancel'          // buttonLabels
+                );
+
+            }
 
 
         }
@@ -127,7 +155,7 @@
         <div data-role="content">
 
             <ul data-role="listview" id="applist">
-                <li>
+                <!--<li>
                     <a href="#" id="app01">
                         <img src="images/app/angry-bird.jpg" class="appIcon">
                         <h4>Angry Birds</h4>
@@ -135,7 +163,7 @@
                         <p>The survival of the Angry Birds is at stake.</p>
                     </a>
                     <a href="#" data-icon="plus" id="btnApp01"></a>
-                </li>
+                </li>-->
             </ul>
 
             <!--<div data-role="collapsible">
@@ -217,7 +245,7 @@
 
                         <p>The survival of the Angry Birds is at stake.</p>
                     </a>
-                    <a href="#" data-icon="plus" id="mybtnApp01"></a>
+                    <a href="#" data-icon="plus" id="app1" class="launchAppBtn"></a>
                 </li>
             </ul>
 
