@@ -19,6 +19,7 @@
     <script src="jquery-1.6.1.min.js"></script>
     <script src="jquery.tmpl.min.js"></script>
     <script src="jquery.mobile-1.0b1.min.js"></script>
+    <script src="jquery.json-2.2.min.js"></script>
 
     <script src="data.js"></script>
 
@@ -51,17 +52,60 @@
                             url: app.packageUrl
                         },
                         function() {
-                            alert('Download Success: ' + app.name)
+                            alert('Download Success: ' + app.name);
+                            var downloaded = false;
+                            var downloads = $.parseJSON(window.localStorage.getItem('downloads'));
+                            for (var i = 0; i < downloads.length; i++) {
+                                var downloadedApp = downloads[i];
+                                if(downloadedApp.id == app.id){
+                                    downloaded = true;
+                                    break;
+                                }
+                            }
+                            if(!downloaded){
+                                downloads.push(app);
+                                window.localStorage.setItem('downloads', $.toJSON(downloads));
+                            }
+
+
+                            renderMyApp();
                         },
                         function() {
-                            alert('Failed to download app: ' + app.name)
+                            alert('Failed to download app: ' + app.name);
                         }
                 );
             }
         }
 
+        function initDb() {
+            if (!window.localStorage.getItem('downloads')) {
+                window.localStorage.setItem('downloads', "[]");
+            }
+
+        }
+
+        function renderMyApp() {
+            $('#myapplist').empty();
+            var downloads = $.parseJSON(window.localStorage.getItem('downloads'));
+            if (downloads) {
+                for (var i = 0; i < downloads.length; i++) {
+                    var app = downloads[i];
+
+                    addMyAppToList(app);
+                }
+            }
+        }
+
+        function addMyAppToList(app) {
+            var myAppTemplate = '<li><a href="#" class="myAppLink"><img src="${imageUrl}" class="appIcon"><h4>${name}</h4><p>${description}</p></a><a href="#" id="app${id}" data-icon="plus" class="launchAppBtn"></a></li>';
+            $.tmpl(myAppTemplate, app).appendTo('#myapplist');
+            $('#myapplist').listview('refresh');
+        }
+
 
         $(document).ready(function() {
+
+            initDb();
 
             var appStore = new APPStore();
 
@@ -77,22 +121,24 @@
             });
 
             $('.launchAppBtn').live('tap', function(event, ui) {
-                launchApp(this.id, 'Angry Birds');
+                launchApp(this.id);
             });
 
             function onAppLoad(data) {
-
+                $('#applist').empty();
                 for (var i = 0; i < data.length; i++) {
                     var app = data[i];
                     addAppToList(app);
                 }
             }
 
+
             // PhoneGap is ready
             //
             function onDeviceReady() {
 
                 appStore.load(onAppLoad);
+                renderMyApp();
             }
 
             var appTemplate = '<li><a href="#" data-transition="slideup" class="appLink"><img src="${imageUrl}" class="appIcon"><h4>${name}</h4><p>${description}</p></a><a href="#" id="app${id}" data-icon="plus" class="appButton"></a></li>';
@@ -109,12 +155,12 @@
 
         });
 
-        function launchApp(id, name) {
+        function launchApp(id) {
             var app = APPStore.cachedApps[id];
             if (app) {
 
                 navigator.notification.confirm(
-                        'Launching application: ' + name, // message
+                        'Launching application: ' + app.name, // message
                         function(data) {
                             if (data == 1) {
                                 window.plugins.launchapp.launch(
@@ -166,49 +212,6 @@
                 </li>-->
             </ul>
 
-            <!--<div data-role="collapsible">
-                <h3>bar</h3>
-
-                <p>View internal page called <a href="#bar" data-role="button">bar</a></p>
-
-
-            </div>
-
-            <div data-role="collapsible">
-                <h3>baz</h3>
-
-                <p>View internal page called <a href="#baz" data-role="button" data-rel="dialog"
-                                                data-transition="pop">baz</a>
-                    as a dialog.
-                </p>
-            </div>
-
-
-            <ul data-role="listview">
-                <li>
-                    <a href="#bar" data-transition="slideup">Slideup </a>
-                </li>
-                <li>
-                    <a href="tel:10010" data-transition="fade">Call 10010 </a>
-                </li>
-                <li>
-                    <a href="#" class="linkToBaz">JS to Baz </a>
-                </li>
-            </ul>
-
-            <div data-role="fieldcontain">
-                <label for="select-choice-1" class="select">Choose shipping method:</label>
-                <select name="select-choice-1" id="select-choice-1">
-                    <option value="standard">Standard: 7 day</option>
-                    <option value="rush">Rush: 3 days</option>
-                    <option value="express">Express: next day</option>
-                    <option value="overnight">Overnight</option>
-                </select>
-            </div>-->
-
-
-            <!-- /grid-a -->
-
 
         </div>
         <!-- /content -->
@@ -238,7 +241,7 @@
         <div data-role="content">
 
             <ul data-role="listview" id="myapplist">
-                <li>
+                <!--<li>
                     <a href="#" id="myapp01">
                         <img src="images/app/angry-bird.jpg">
                         <h4>Angry Birds</h4>
@@ -246,7 +249,7 @@
                         <p>The survival of the Angry Birds is at stake.</p>
                     </a>
                     <a href="#" data-icon="plus" id="app1" class="launchAppBtn"></a>
-                </li>
+                </li>-->
             </ul>
 
         </div>

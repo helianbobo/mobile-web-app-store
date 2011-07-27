@@ -31,12 +31,13 @@ public class DownloadAppPlugin extends Plugin {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return new PluginResult(PluginResult.Status.ERROR);
         }
         return new PluginResult(PluginResult.Status.OK);
     }
 
-    private void download(String id, String urlString) {
-        try {
+    private void download(String id, String urlString)throws IOException{
+
 
             String appDir = "apps" + id;
             File fileAppDir = this.ctx.getDir(appDir, Context.MODE_PRIVATE);
@@ -82,8 +83,6 @@ public class DownloadAppPlugin extends Plugin {
             }
             zin.close();
             is.close();
-        } catch (IOException e) {
-            Log.d("log_tag", "Error: " + e);
-        }
+
     }
 }
